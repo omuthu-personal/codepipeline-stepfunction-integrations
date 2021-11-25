@@ -1,0 +1,20 @@
+version: 0.2
+
+env:
+  variables:
+    dummykey: "dummyvalue"
+phases:
+  build:
+    commands:
+      - echo "Dummy codebuild command"
+      - cp sample_source.json /tmp/ABC.json
+      - echo "Dummy codebuild secondary file ABC" > /tmp/secondaryABC.txt
+artifacts:
+  files:
+    - /tmp/ABC.json
+  discard-paths: yes
+  secondary-artifacts:
+    artifact1:
+      files:
+        - /tmp/secondaryABC.txt
+      discard-paths: yes

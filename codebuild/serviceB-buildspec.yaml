@@ -1,0 +1,13 @@
+version: 0.2
+
+env:
+  variables:
+    dummykey: "dummyvalue"
+phases:
+  build:
+    commands:
+      - echo 'serviceA content' > /tmp/serviceA.json
+artifacts:
+  files:
+    - /tmp/serviceA.json
+  discard-paths: yes

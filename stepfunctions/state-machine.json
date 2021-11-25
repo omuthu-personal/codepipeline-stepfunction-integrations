@@ -1,0 +1,70 @@
+{
+  "Comment": "An example of state machine which iterates each input and pass it to choice and makes respective invocation",
+  "StartAt": "ServicesMap",
+  "States": {
+    "ServicesMap": {
+      "Type": "Map",
+      "InputPath": "$.services",
+      "ItemsPath": "$",
+      "Parameters": {
+        "service.$": "$$.Map.Item.Value"
+      },
+      "Iterator": {
+        "StartAt": "ChoiceExecution",
+        "States": {
+          "ChoiceExecution": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.service",
+                "StringEquals": "service_A",
+                "Next": "serviceA"
+              },
+              {
+                "Variable": "$.service",
+                "StringEquals": "service_B",
+                "Next": "serviceB"
+              },
+              {
+                "Variable": "$.service",
+                "StringEquals": "service_C",
+                "Next": "serviceC"
+              }
+            ],
+            "Default": "NoAction"
+          },
+          "serviceA": {
+            "Comment": "Service A",
+            "Type": "Task",
+            "Resource": "arn:aws:states:::codebuild:startBuild.sync",
+            "Parameters": {
+              "ProjectName": "CodeBuildServiceA"
+            },
+            "End": true
+          },
+          "serviceB": {
+            "Comment": "Service B",
+            "Type": "Task",
+            "Resource": "arn:aws:states:::codebuild:startBuild.sync",
+            "Parameters": {
+              "ProjectName": "CodeBuildServiceB"
+            },
+            "End": true
+          },
+          "serviceC": {
+            "Comment": "Service C",
+            "Type": "Pass",
+            "InputPath": "$.service",
+            "ResultPath": "$.service",
+            "End": true
+          },
+          "NoAction": {
+            "Type": "Pass",
+            "End": true
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}
