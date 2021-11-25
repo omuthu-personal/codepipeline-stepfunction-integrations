@@ -1,0 +1,111 @@
+{
+    "pipeline": {
+        "name": "sample-codebuild-stepfunctions-pipeline",
+        "roleArn": "arn:aws:iam::000123456789:role/service-role/AWSCodePipelineServiceRole-us-east-2-CodePipelineRole",
+        "artifactStore": {
+            "type": "S3",
+            "location": "codepipeline-us-east-2-924671760458"
+        },
+        "stages": [
+            {
+                "name": "Source",
+                "actions": [
+                    {
+                        "name": "Source",
+                        "actionTypeId": {
+                            "category": "Source",
+                            "owner": "AWS",
+                            "provider": "CodeCommit",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "BranchName": "master",
+                            "OutputArtifactFormat": "CODE_ZIP",
+                            "PollForSourceChanges": "false",
+                            "RepositoryName": "omuthu-common-repo"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "inputArtifacts": [],
+                        "region": "us-east-2",
+                        "namespace": "SourceVariables"
+                    }
+                ]
+            },
+            {
+                "name": "Build",
+                "actions": [
+                    {
+                        "name": "Build",
+                        "actionTypeId": {
+                            "category": "Build",
+                            "owner": "AWS",
+                            "provider": "CodeBuild",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "BatchEnabled": "false",
+                            "ProjectName": "sample-codebuild-1"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "BuildArtifact"
+                            }
+                        ],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "region": "us-east-2",
+                        "namespace": "BuildVariables"
+                    }
+                ]
+            },
+            {
+                "name": "InvokeStepFunction",
+                "actions": [
+                    {
+                        "name": "InvokeCodeBuildStepFunction",
+                        "actionTypeId": {
+                            "category": "Invoke",
+                            "owner": "AWS",
+                            "provider": "StepFunctions",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "ExecutionNamePrefix": "sample-cb-",
+                            "Input": "ABC.json",
+                            "InputType": "FilePath",
+                            "StateMachineArn": "arn:aws:states:us-east-2:000123456789:stateMachine:sample-codebuild-state-machine"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "StepFunctionOutputArtifact"
+                            }
+                        ],
+                        "inputArtifacts": [
+                            {
+                                "name": "BuildArtifact"
+                            }
+                        ],
+                        "region": "us-east-2",
+                        "namespace": "SFnamespace"
+                    }
+                ]
+            }
+        ],
+        "version": 2
+    },
+    "metadata": {
+        "pipelineArn": "arn:aws:codepipeline:us-east-2:000123456789:sample-codebuild-stepfunctions-pipeline",
+        "created": "2021-11-24T13:36:00.779000+05:30",
+        "updated": "2021-11-24T16:59:59.655000+05:30"
+    }
+}
